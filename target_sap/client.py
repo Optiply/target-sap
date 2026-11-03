@@ -43,7 +43,7 @@ class SapSink(HotglueSink):
 
     @property
     def base_url(self):
-        return self.config["base_url"].rstrip("/") + "/"
+        return self.config["api_url"].rstrip("/") + "/"
 
     @property
     def http_headers(self):

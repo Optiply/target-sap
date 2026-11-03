@@ -191,16 +191,20 @@ def test_cli_unknown_stream_fails_without_writes(cli, source_record, sap):
     assert not sap.requests
 
 
-def test_cli_rejects_company_state_reuse(cli, source_record, sap, config):
+@pytest.mark.parametrize("scope_field, other_value", [
+    ("company_db", "DIFFERENT_COMPANY"),
+    ("base_url", "https://other.example.invalid:50000/b1s/v2"),
+])
+def test_cli_rejects_company_state_reuse(cli, source_record, sap, config, scope_field, other_value):
     assert cli([source_record]).returncode == 0
     saved = state_file(config)
-    saved["sap_company"]["company_db"] = "DIFFERENT_COMPANY"
+    saved["sap_company"][scope_field] = other_value
     Path(config["state_path"]).write_text(json.dumps(saved))
     count = len(sap.requests)
     failed = cli([source_record])
     assert failed.returncode != 0 and failed.stdout == ""
     assert len(sap.requests) == count
-    assert state_file(config)["sap_company"]["company_db"] == "DIFFERENT_COMPANY"
+    assert state_file(config)["sap_company"][scope_field] == other_value
 
 
 def test_interruption_retains_success_without_acknowledging_unread_input(config, source_record, sap, capsys):
@@ -409,3 +413,17 @@ target.listen()
     assert recovered.returncode == 0, recovered.stderr
     assert sap.orders[5001]["DocumentLines"][0]["Quantity"] == 4
     assert [row["method"] for row in writes(sap)] == ["POST", "PATCH", "PATCH"]
+
+
+def test_cli_api_url_retains_existing_scoped_pending_create_state(cli, source_record, sap, config):
+    Path(config["state_path"]).write_text(json.dumps({
+        "sap_company": {"base_url": sap.base_url.rstrip("/"), "company_db": config["company_db"]},
+        "sap_pending_creates": {"900001": True},
+    }))
+    failed = cli([source_record])
+    assert failed.returncode != 0 and failed.stdout == ""
+    saved = state_file(config)
+    assert saved["sap_pending_creates"] == {"900001": True}
+    assert saved["bookmarks"]["BuyOrders"][0]["externalId"] == "900001"
+    assert saved["bookmarks"]["BuyOrders"][0]["success"] is False
+    assert not writes(sap)

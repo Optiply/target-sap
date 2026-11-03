@@ -21,11 +21,16 @@ POETRY_VIRTUALENVS_IN_PROJECT=true poetry sync
 
 | Setting | Required | Description |
 | --- | --- | --- |
-| `base_url` | Yes | HTTPS SAP Service Layer URL ending in `/b1s/v2/`. |
+| `api_url` | Yes | HTTPS SAP Service Layer URL ending in `/b1s/v2/`. |
 | `company_db` | Yes | SAP company database used for Login and all order operations. |
 | `username` | Yes | SAP Service Layer username. |
 | `password` | Yes | SAP Service Layer password. |
 | `state_path` | No | Durable target state file. Defaults to `target-state.json`, relative to the working directory. Retain it across retries. |
+
+The connection fields match `tap-sap-b1`: `api_url`, `company_db`, `username` and
+`password`. Rename `base_url` to `api_url` in older target configurations; the old
+configuration key is no longer supported. Keep the existing target state file.
+Unlike the tap's default `/b1s/v1`, this target still requires `/b1s/v2/`.
 
 ### Example Configuration
 
@@ -34,7 +39,7 @@ ignored `config.json`:
 
 ```json
 {
-  "base_url": "https://sap.example.invalid:50000/b1s/v2/",
+  "api_url": "https://sap.example.invalid:50000/b1s/v2/",
   "company_db": "SYNTHETIC_COMPANY",
   "username": "SYNTHETIC_USER",
   "password": "SYNTHETIC_PASSWORD",

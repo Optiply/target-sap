@@ -23,7 +23,7 @@ class TargetSap(TargetHotglue):
     SINK_TYPES = [BuyOrders]
     MAX_PARALLELISM = 1
     config_jsonschema = th.PropertiesList(
-        th.Property("base_url", th.StringType, required=True),
+        th.Property("api_url", th.StringType, required=True),
         th.Property("company_db", th.StringType, required=True),
         th.Property("username", th.StringType, required=True),
         th.Property("password", th.StringType, required=True),
@@ -41,7 +41,7 @@ class TargetSap(TargetHotglue):
 
     def _validate_config(self, *args, **kwargs):
         result = super()._validate_config(*args, **kwargs)
-        url = urlsplit(self.config.get("base_url", ""))
+        url = urlsplit(self.config.get("api_url", ""))
         if (
             url.scheme != "https"
             or not url.hostname
@@ -51,7 +51,7 @@ class TargetSap(TargetHotglue):
             or url.fragment
             or not url.path.rstrip("/").endswith("/b1s/v2")
         ):
-            raise ConfigValidationError("base_url must be an HTTPS Service Layer root ending /b1s/v2/")
+            raise ConfigValidationError("api_url must be an HTTPS Service Layer root ending /b1s/v2/")
         if os.environ.get("STREAMING_JOB") == "True":
             raise ConfigValidationError("target-sap supports scheduled exports, not streaming jobs")
         return result
@@ -62,8 +62,9 @@ class TargetSap(TargetHotglue):
 
     @property
     def company_scope(self) -> dict:
+        # Keep the persisted scope format stable when configuration keys change.
         return {
-            "base_url": self.config["base_url"].rstrip("/"),
+            "base_url": self.config["api_url"].rstrip("/"),
             "company_db": self.config["company_db"],
         }
 

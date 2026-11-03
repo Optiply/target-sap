@@ -83,9 +83,9 @@ def test_retry_after_cannot_block_unboundedly(sink):
     assert sink._retry_delay(RetriableAPIError("rate limited", response), 0) == 30
 
 
-@pytest.mark.parametrize("base_url", ["http://localhost/b1s/v2/", "https://user:pass@localhost/b1s/v2/", "https://localhost/b1s/v1/", "https://localhost/b1s/v2/?token=bad"])
-def test_unsafe_service_root_rejected_before_authentication(config, sap, base_url):
-    config["base_url"] = base_url
+@pytest.mark.parametrize("api_url", ["http://localhost/b1s/v2/", "https://user:pass@localhost/b1s/v2/", "https://localhost/b1s/v1/", "https://localhost/b1s/v2/?token=bad"])
+def test_unsafe_service_root_rejected_before_authentication(config, sap, api_url):
+    config["api_url"] = api_url
     with pytest.raises(ConfigValidationError):
         TargetSap(config=config)
     assert not sap.requests

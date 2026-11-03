@@ -198,7 +198,7 @@ def source_record():
 @pytest.fixture
 def config(sap, isolated_workdir):
     return {
-        "base_url": sap.base_url, "company_db": "SYNTHETIC_COMPANY",
+        "api_url": sap.base_url, "company_db": "SYNTHETIC_COMPANY",
         "username": "SYNTHETIC_USER", "password": "SYNTHETIC_PASSWORD",
         "state_path": str(isolated_workdir / "target-state.json"),
     }
