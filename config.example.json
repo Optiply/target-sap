@@ -1,0 +1,7 @@
+{
+  "base_url": "https://sap.example.invalid:50000/b1s/v2/",
+  "company_db": "SYNTHETIC_COMPANY",
+  "username": "SYNTHETIC_USER",
+  "password": "SYNTHETIC_PASSWORD",
+  "state_path": "../target-state.json"
+}

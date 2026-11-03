@@ -1,0 +1,3 @@
+{"type":"SCHEMA","stream":"BuyOrders","key_properties":[],"schema":{"type":"object","properties":{"id":{"type":["integer","string"]},"externalid":{"type":["integer","string"]},"supplier_remoteId":{"type":"string"},"supplier_name":{"type":"string"},"created_at":{"type":"string","format":"date-time"},"line_items":{"type":["string","array"]}}}}
+{"type":"RECORD","stream":"BuyOrders","record":{"id":"900001","externalid":"900001","supplier_remoteId":"VENDOR-DEMO","created_at":"2026-10-17T12:00:00Z","supplier_name":"Ignored supplier name","line_items":"[{\"line_id\":\"900101\",\"sku\":\"SKU-DEMO\",\"quantity\":24,\"sub_total_price\":120,\"lot_size\":999}]"}}
+{"type":"STATE","value":{"synthetic_checkpoint":"before-sap"}}

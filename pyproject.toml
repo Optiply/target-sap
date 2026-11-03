@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "target-sap"
+version = "0.1.0"
+description = "HotGlue Singer target for PacoVerpakkingen SAP Business One purchase orders."
+authors = ["Optiply Integrations"]
+readme = "README.md"
+packages = [{include = "target_sap"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+hotglue-singer-sdk = "1.0.38"
+requests = "^2.32.5"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.0"
+
+[tool.poetry.scripts]
+target-sap = "target_sap.target:TargetSap.cli"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--basetemp=.test-work"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
