@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "target-sap"
+name = "target-sap-b1"
 version = "0.1.0"
 description = "HotGlue Singer target for PacoVerpakkingen SAP Business One purchase orders."
 authors = ["Optiply Integrations"]
 readme = "README.md"
-packages = [{include = "target_sap"}]
+packages = [{include = "target_sap_b1"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
@@ -15,7 +15,7 @@ requests = "^2.32.5"
 pytest = "^8.4.0"
 
 [tool.poetry.scripts]
-target-sap = "target_sap.target:TargetSap.cli"
+target-sap-b1 = "target_sap_b1.target:TargetSAPB1.cli"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

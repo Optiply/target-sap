@@ -1,6 +1,6 @@
-# target-sap
+# target-sap-b1
 
-`target-sap` is a Singer target for SAP Business One Service Layer OData v4,
+`target-sap-b1` is a Singer target for SAP Business One Service Layer OData v4,
 currently supporting PacoVerpakkingen buy-order exports.
 
 Built with the [HotGlue Singer SDK](https://pypi.org/project/hotglue-singer-sdk/)
@@ -14,6 +14,13 @@ Install from source using Python **3.10** and Poetry **2**. From this directory:
 POETRY_VIRTUALENVS_IN_PROJECT=true poetry env use python3.10
 POETRY_VIRTUALENVS_IN_PROJECT=true poetry sync
 ```
+
+The executable and SDK target name are `target-sap-b1`; Python imports use
+`target_sap_b1.target.TargetSAPB1`, matching the tap's
+`tap-sap-b1` / `tap_sap_b1.tap.TapSAPB1` naming.
+When replacing an existing `target-sap` installation, uninstall that distribution
+before installing this package; the old executable and module are not aliases.
+Keep the existing state file and `state_path`; persisted state keys are unchanged.
 
 ## Configuration
 
@@ -62,8 +69,8 @@ in memory. HTTPS certificate verification is mandatory; for a private CA, set
 ### Executing the Target Directly
 
 ```bash
-poetry run target-sap --version
-poetry run target-sap --help
+poetry run target-sap-b1 --version
+poetry run target-sap-b1 --help
 ```
 
 The target accepts approved Singer SCHEMA/RECORD/STATE messages for the exact
@@ -76,7 +83,7 @@ in an ignored working directory:
 mkdir -p .local/run .local/.secrets
 (
   cd .local/run
-  ../../.venv/bin/target-sap --config ../../config.json < /path/to/buy-orders.jsonl
+  ../../.venv/bin/target-sap-b1 --config ../../config.json < /path/to/buy-orders.jsonl
 )
 ```
 
@@ -135,8 +142,9 @@ weekend-shift configuration are not supported.
 
 Before enabling the target, the ETL owner must:
 
-1. Add `or target.startswith("sap")` to the default buy-order target allowlist.
+1. Add `or target.startswith("sap-b1")` to the default buy-order target allowlist.
 2. Retain line `sub_total_price` (derived from `subtotalValue`).
+3. Preserve SKU and supplier-code strings when reading CSV snapshots.
 
 Keep the existing ETL weekend-to-Monday shift; the target adds no date shift.
 The runner must retain target state and must not publish ETL/header checkpoints
@@ -155,7 +163,7 @@ local tests, not a production order.
 
 ```bash
 poetry run pytest
-poetry run target-sap --help
+poetry run target-sap-b1 --help
 ```
 
 Test artifacts, caches and generated TLS files stay in ignored directories.

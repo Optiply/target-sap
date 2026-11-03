@@ -5,8 +5,8 @@ import requests
 from hotglue_etl_exceptions import InvalidCredentialsError
 from hotglue_singer_sdk.exceptions import ConfigValidationError, FatalAPIError, RetriableAPIError
 
-from target_sap.client import SapAPIError
-from target_sap.target import TargetSap
+from target_sap_b1.client import SapAPIError
+from target_sap_b1.target import TargetSAPB1
 
 
 PARAMS = {"$filter": "ItemCode eq 'SKU-DEMO'"}
@@ -15,7 +15,7 @@ PARAMS = {"$filter": "ItemCode eq 'SKU-DEMO'"}
 def test_safe_get_retries_transient_failures_with_bounded_delay(sink, sap, monkeypatch):
     sap.statuses["GET Items"] = [503, 429]
     delays = []
-    monkeypatch.setattr("target_sap.client.time.sleep", delays.append)
+    monkeypatch.setattr("target_sap_b1.client.time.sleep", delays.append)
     response = sink.request_api("GET", "Items", params=PARAMS)
     assert response.json()["value"] == [{"ItemCode": "SKU-DEMO", "PurchaseItemsPerUnit": 6}]
     assert len([row for row in sap.requests if row["endpoint"] == "Items"]) == 3
@@ -24,7 +24,7 @@ def test_safe_get_retries_transient_failures_with_bounded_delay(sink, sap, monke
 
 def test_safe_get_stops_after_three_attempts(sink, sap, monkeypatch):
     sap.statuses["GET Items"] = [503, 503, 503, 200]
-    monkeypatch.setattr("target_sap.client.time.sleep", lambda _: None)
+    monkeypatch.setattr("target_sap_b1.client.time.sleep", lambda _: None)
     with pytest.raises(RetriableAPIError):
         sink.request_api("GET", "Items", params=PARAMS)
     assert len([row for row in sap.requests if row["endpoint"] == "Items"]) == 3
@@ -70,7 +70,7 @@ def test_transport_timeout_never_blindly_retries_a_write(sink, monkeypatch, meth
         raise requests.exceptions.ReadTimeout("synthetic timeout")
 
     monkeypatch.setattr(sink, "_request", timed_out)
-    monkeypatch.setattr("target_sap.client.time.sleep", lambda _: None)
+    monkeypatch.setattr("target_sap_b1.client.time.sleep", lambda _: None)
     with pytest.raises(requests.exceptions.ReadTimeout):
         sink.request_api(method, "PurchaseOrders")
     assert calls == [method] * attempts
@@ -87,7 +87,7 @@ def test_retry_after_cannot_block_unboundedly(sink):
 def test_unsafe_service_root_rejected_before_authentication(config, sap, api_url):
     config["api_url"] = api_url
     with pytest.raises(ConfigValidationError):
-        TargetSap(config=config)
+        TargetSAPB1(config=config)
     assert not sap.requests
 
 

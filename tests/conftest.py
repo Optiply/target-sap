@@ -218,7 +218,7 @@ def cli(config, isolated_workdir):
             messages.append({"type": "STATE", "value": {"synthetic_checkpoint": "before-sap"}})
             input_text = "".join(json.dumps(message) + "\n" for message in messages)
         return subprocess.run(
-            [str(Path(sys.executable).with_name("target-sap")), "--config", str(path)] + (["--state", str(state)] if state else []),
+            [str(Path(sys.executable).with_name("target-sap-b1")), "--config", str(path)] + (["--state", str(state)] if state else []),
             input=input_text, text=True, capture_output=True, cwd=isolated_workdir,
             env=os.environ.copy(), timeout=30,
         )
@@ -228,10 +228,10 @@ def cli(config, isolated_workdir):
 
 @pytest.fixture
 def sink(config):
-    from target_sap.sinks import BuyOrders
-    from target_sap.target import TargetSap
+    from target_sap_b1.sinks import BuyOrders
+    from target_sap_b1.target import TargetSAPB1
 
-    target = TargetSap(config=config)
+    target = TargetSAPB1(config=config)
     instance = BuyOrders(target, "BuyOrders", {"type": "object", "properties": {}}, [])
     instance.init_state()
     yield instance

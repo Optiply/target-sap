@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from hotglue_singer_sdk.exceptions import FatalAPIError
 
-from target_sap.target import TargetSap
+from target_sap_b1.target import TargetSAPB1
 
 from conftest import ROOT
 
@@ -208,7 +208,7 @@ def test_cli_rejects_company_state_reuse(cli, source_record, sap, config, scope_
 
 
 def test_interruption_retains_success_without_acknowledging_unread_input(config, source_record, sap, capsys):
-    target = TargetSap(config=config)
+    target = TargetSAPB1(config=config)
     schema = (ROOT / "tests/fixtures/buy_orders.jsonl").read_text().splitlines()[0]
     second = copy.deepcopy(source_record)
     second["id"] = second["externalid"] = "900002"
@@ -259,7 +259,7 @@ def test_cli_matching_closed_order_is_idempotent_on_cold_replay(cli, source_reco
 
 @pytest.mark.parametrize("ending", ["failure", "interruption"])
 def test_timed_intermediate_drain_cannot_acknowledge_an_eventually_failed_job(config, source_record, sap, capsys, ending):
-    target = TargetSap(config=config)
+    target = TargetSAPB1(config=config)
     target._MAX_RECORD_AGE_IN_MINUTES = -1
     schema = (ROOT / "tests/fixtures/buy_orders.jsonl").read_text().splitlines()[0]
     second = copy.deepcopy(source_record)
@@ -281,7 +281,7 @@ def test_timed_intermediate_drain_cannot_acknowledge_an_eventually_failed_job(co
 
 
 def test_timed_drains_acknowledge_once_only_after_successful_eof(config, source_record, sap, capsys):
-    target = TargetSap(config=config)
+    target = TargetSAPB1(config=config)
     target._MAX_RECORD_AGE_IN_MINUTES = -1
     schema = (ROOT / "tests/fixtures/buy_orders.jsonl").read_text().splitlines()[0]
     record = json.dumps({"type": "RECORD", "stream": "BuyOrders", "record": source_record})
@@ -322,8 +322,8 @@ def test_process_death_after_durable_marker_cannot_authorize_recreate(cli, sourc
     script = """
 import os
 import sys
-from target_sap.target import TargetSap
-target = TargetSap(config=sys.argv[1])
+from target_sap_b1.target import TargetSAPB1
+target = TargetSAPB1(config=sys.argv[1])
 persist = target.persist_state
 def crash_after_marker(state):
     persist(state)
@@ -369,8 +369,8 @@ def test_committed_patch_with_failed_readback_cannot_leave_old_hash_replayable(c
     changed = copy.deepcopy(source_record)
     changed["line_items"] = [{"line_id": "900101", "sku": "SKU-DEMO", "quantity": 30, "sub_total_price": 150}]
     sap.statuses["GET PurchaseOrders(5001)"] = [200, 503, 503, 503]
-    monkeypatch.setattr("target_sap.client.time.sleep", lambda _: None)
-    target = TargetSap(config=config)
+    monkeypatch.setattr("target_sap_b1.client.time.sleep", lambda _: None)
+    target = TargetSAPB1(config=config)
     schema = (ROOT / "tests/fixtures/buy_orders.jsonl").read_text().splitlines()[0]
     with pytest.raises(FatalAPIError):
         target.listen(iter([schema + "\n", json.dumps({"type": "RECORD", "stream": "BuyOrders", "record": changed}) + "\n"]))
@@ -390,14 +390,14 @@ def test_process_death_after_patch_before_bookmark_requires_reconciliation(cli, 
     script = """
 import os
 import sys
-from target_sap.sinks import BuyOrders
-from target_sap.target import TargetSap
+from target_sap_b1.sinks import BuyOrders
+from target_sap_b1.target import TargetSAPB1
 class CrashAfterPatch(BuyOrders):
     def update_state(self, state, *args, **kwargs):
         if state.get("is_updated"):
             os._exit(74)
         return super().update_state(state, *args, **kwargs)
-target = TargetSap(config=sys.argv[1])
+target = TargetSAPB1(config=sys.argv[1])
 target.get_sink_class = lambda stream_name: CrashAfterPatch
 target.listen()
 """

@@ -14,11 +14,11 @@ from hotglue_singer_sdk.exceptions import ConfigValidationError, FatalAPIError
 from hotglue_singer_sdk.helpers.capabilities import AlertingLevel
 from hotglue_singer_sdk.target_sdk.target import TargetHotglue
 
-from target_sap.sinks import BuyOrders, source_identity
+from target_sap_b1.sinks import BuyOrders, source_identity
 
 
-class TargetSap(TargetHotglue):
-    name = "target-sap"
+class TargetSAPB1(TargetHotglue):
+    name = "target-sap-b1"
     alerting_level = AlertingLevel.WARNING
     SINK_TYPES = [BuyOrders]
     MAX_PARALLELISM = 1
@@ -53,7 +53,7 @@ class TargetSap(TargetHotglue):
         ):
             raise ConfigValidationError("api_url must be an HTTPS Service Layer root ending /b1s/v2/")
         if os.environ.get("STREAMING_JOB") == "True":
-            raise ConfigValidationError("target-sap supports scheduled exports, not streaming jobs")
+            raise ConfigValidationError("target-sap-b1 supports scheduled exports, not streaming jobs")
         return result
 
     @property
@@ -150,4 +150,4 @@ class TargetSap(TargetHotglue):
 
 
 if __name__ == "__main__":
-    TargetSap.cli()
+    TargetSAPB1.cli()

@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from target_sap.sinks import source_identity
+from target_sap_b1.sinks import source_identity
 
 
 def prepared(sink, record):

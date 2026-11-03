@@ -11,7 +11,7 @@ import requests
 from hotglue_etl_exceptions import InvalidCredentialsError
 from hotglue_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
-from target_sap.client import SapAPIError, SapSink
+from target_sap_b1.client import SapAPIError, SapSink
 
 
 def _text(value, field, allow_integer=False):
