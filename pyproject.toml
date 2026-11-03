@@ -12,7 +12,7 @@ hotglue-singer-sdk = "1.0.38"
 requests = "^2.32.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4.0"
+pytest = ">=8.4,<10.0"
 
 [tool.poetry.scripts]
 target-sap-b1 = "target_sap_b1.target:TargetSAPB1.cli"
